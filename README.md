@@ -1,5 +1,5 @@
 # PowerShell
 PowerShell Starter
 Get-help
-Get-event
+Get-eventlog -LogName System
 
