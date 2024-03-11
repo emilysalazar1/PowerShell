@@ -1,0 +1,192 @@
+#Task 1
+Get-Date
+
+Get-Command *Date*
+
+Get-Date |GM
+
+(Get-Date).DayOfYear
+
+Get-Date | Select-Object -Property DayOfYear
+
+
+#Task 2
+
+Get-Command *HotFix*
+
+Get-HotFix | FT
+
+Get-HotFix | GM
+
+Get-HotFix | Select-object 
+
+Get-HotFix | Select-Object InstalledOn, HotFixID, InstalledBy 
+
+Get-HotFix | Select-Object InstalledOn , HotFixID, InstalledBy 
+
+Get-HotFix | Select-Object -Property HotFixID, Name, @{n='NumberOfDaysSinceInstalled'; e={((Get-Date) - $_.InstalledON).Days}}
+
+
+#Task 3
+
+Get-Command *scope* -and *dhcp* 
+
+Get-DhcpServerv4Scope -ComputerName LON-DC1 
+
+Get-DhcpServerv4Scope -ComputerName LON-DC1 | Select-Object -Property ScopeID,SubnetMask,ScopeName 
+
+Get-help Get-DhcpServerv4Scope
+
+Get-DhcpServerv4Scope -ComputerName LON-DC1 | Select-Object -Property ScopeID,SubnetMask,ScopeName | FL
+
+#Task 4 
+
+Get-Command *rule*
+
+Get-NetFirewallRule | GM
+
+Get-Help "Get-NetFirewallRule"
+
+Get-NetFirewallRule -Enabled True
+
+Get-NetFirewallRule -Enabled True | FT -wrap
+
+Get-NetFirewallRule -Enabled True | Select-Object PropertyDisplayName,Profile,Description, Action | FL 
+
+Get-NetfirewallRule -Enabled True | Sort-Object -Property Profile,DisplayName | Select-Object -Property DisplayName,Profile,Description,Action | FL -GroupBy Profile
+
+#Task 5
+
+Get-Command *neighbor*
+
+Get-NetNeighbor
+
+Get-Help Get-NetNeighbor
+
+Get-NetNeighbor | GM
+
+Get-NetNeighbor | Sort-Object -Property State
+
+Get-NetNeighbor | Sort-Object -Property State | Select-Object -Property IPAddress
+
+#Task 6
+
+Test-Connection LON-DC1
+
+Get-Command *Cache*
+
+Get-DnsClientCache
+
+Get-DnsClientCache | GM
+
+Get-DnsClientCache | Sort-Object -Property Name | Select-Object name, recordtype, ttl | FL
+
+#Task 7
+
+Get-ADUser -Filter * | GM
+
+Get-ADUser -Filter * -Properties *
+
+Get-ADUser -Filter {Department -EQ "IT" -and City -EQ "London" } -Properties * | Select-Object Name, Department, City
+
+Get-Command *Office*
+
+Get-ADUser -Filter * -Properties office
+
+Get-Command *location*
+
+Get-Help Set-Location
+
+Set-Location -LiteralPath LON-A/1000
+
+
+Get-ADUser -Filter {Department -EQ "IT" -and City -EQ "London" } -Properties * | Select-Object Name, Department, City, Office
+
+$users = Get-ADUser -Filter {(Department -EQ "IT") -And (City -EQ "London")} 
+foreach ($users in $users) {
+    Set-ADUser -Identity $users -Office "LON-A/1000" 
+        }
+
+
+        $users = Get-ADUser -Filter {(Department -EQ "IT") -And (City -EQ "London")} 
+        foreach ($users in $users) {
+            Set-ADUser -Identity $users -Office "LON-A/1000" 
+                }
+
+
+Get-ADUser -Filter * -Properties Office
+               #Task 8
+                Get-Help ConvertTo-Html
+
+                Get-Help Out-File
+
+                Get-ADUser -Filter {Department -EQ "IT" -And City -EQ "London"} -Properties * | Select-Object @{n='User'; e={$_.Name}},Department,city,office | ConvertTo-Html | Out-File E:\\UserReport.html
+                #cannot read xml when open in Microsoft Edge
+                Get-ADUser -Filter {Department -EQ "IT" -And City -EQ "London"} -Properties * | Select-Object @{n='User'; e={$_.Name}},Department,city,office | ConvertTo-ConvertTo-xml | Out-File E:\\UserReport.xml
+
+                Get-ADUser -Filter {Department -EQ "IT" -And City -EQ "London"} -Properties * | Select-Object @{n='User'; e={$_.Name}},Department,city,office | ConvertTo-csv | Out-File E:\\UserReport.csv
+#From Lab 3
+Get-ADUser -Filter * -Properties Department,City,Office | 
+Where {$PSItem.Department -eq 'IT' -and $PSItem.City -eq 'London'} | 
+Sort Name | 
+Select-Object -Property Name,Department,City,Office |
+Export-Clixml E:\UserReport.xml
+                
+                #Task 9
+                Get-Command *user*
+
+                Get-Help Get-ADUser 
+
+                Get-ADUser -Filter * -Properties * | Sort-Object -Property * | FT
+                Get-ADUser -Filter * -Properties DisplayName, SamAccountName | Format-Table -AutoSize
+
+
+                Get-ADUser -Filter * -Properties * -SearchBase "cn=Users,DC=adatum,DC=COM" | Format-Table -Wrap
+                Get-ADUser -Filter * -SearchBase "cn=Users,DC=adatum,DC=COM" -Properties DisplayName, SamAccountName | Format-Table
+
+                #Task 10
+                Get-Command *Security*
+                Get-Command *Event* -and *Security* -and *Get*
+                Get-Help Get-EventLog 
+                Get-EventLog -LogName *
+                Get-EventLog -LogName Security | GM
+
+                Get-EventLog -LogName Security | Sort-Object -EventID 
+                (Get-EventLog) {get=$this.get_EventID (4624)}
+
+
+                Get-EventLog -LogName Security | Where-Object {$_.EventID -eq 4624} | Select-Object TimeGenerated,InstanceID, Message -First 10
+
+                Get-EventLog -LogName Security | Where-Object {$_.EventID -eq 4624} | GM
+
+                #Task 11
+                PS E:\User\> Get-ChildItem
+
+                Get-Certificate
+
+                New-SelfSignedCertificate -DnsName "webapp.contoso.com" -CertStoreLocation "Cert:\LocalMachine\My"
+
+                Cert:\LocalMachine\My
+
+                Get-Location -PSDrive *CERT*
+
+                Get-Item -Path *CERT*
+                cd Cert:\LocalMachine
+                Get-ChildItem Cert:\LocalMachine\Root\* | -Recu
+                Get-ChildItem -Recurs
+#From Lab 3
+Get-ChildItem -Path CERT: -Recurse
+Get-ChildItem -Path CERT: -Recurse | 
+Where { $PSItem.HasPrivateKey -eq $False -and $PSItem.NotAfter -gt (Get-Date) -and $PSItem.NotBefore -lt (Get-Date) } |
+ Select-Object -Property NotBefore,NotAfter, FriendlyName,Issuer | ft -wrap
+
+ #Task 12
+ Get-Volume
+ Get-Volume | Where-Object { $PSItem.SizeRemaining -gt 0 } | fl
+ Get-Volume | Where-Object { $PSItem.SizeRemaining -gt 0 -and $PSItem.SizeRemaining / $PSItem.Size -lt .99 }| Select-Object DriveLetter, @{n='Size';e={'{0:N2}' -f ($PSItem.Size/1MB)}}
+ Get-Volume | Where-Object { $PSItem.SizeRemaining -gt 0 -and $PSItem.SizeRemaining / $PSItem.Size -lt .1 }
+
+ #Task 13
+
+ Get-ControlPanelItem
+ Get-ControlPanelItem -Category 'System and Security' | Where-Object -FilterScript {-not ($PSItem.Category -notlike '*System and Security*')} | Sort Name
