@@ -7,3 +7,18 @@ $display = $u.First + " " + $u.Last
 Write-Host "Creating $display in $path"
 New-ADUser -GivenName $u.First -Surname $u.Last -Name $display -DisplayName $display -SamAccountName $u.UserID -UserPrincipalName $UPN -Path $path -Department $u.Department
                 }
+
+$UserDep = $u.Department
+
+ForEach($u in $users) {
+
+
+If ($u.Department -eq 'IT' ) {
+    Write-Host $u.First"'s Department is IT”
+    } 
+    ElseIf ($u.Department -eq 'Sales' ) {
+    Write-Host $u.First"'s Department is Sales”
+        } 
+    Else {
+    Write-Host $u.First"'s Department is NOT IT or Sales”
+    }}
