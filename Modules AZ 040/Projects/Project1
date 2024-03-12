@@ -47,6 +47,12 @@ ForEach($u in $users) {
 
  Get-ADUser -Filter {GivenName -eq $user1} -Properties Department, location, city
 
+ #Get password expiry of ADUser
+                        
+Get-ADUser -identity Dharrington –Properties "DisplayName", "msDS-UserPasswordExpiryTimeComputed" |
+Select-Object -Property "Displayname",@{Name="ExpiryDate";Expression={[datetime]::FromFileTime($_."msDS-UserPasswordExpiryTimeComputed")}}        
 
+#Get password expiry of Group
 
-             
+Get-ADUser -filter * -SearchBase "OU=IT,DC=Adatum,DC=com" –Properties "DisplayName", "msDS-UserPasswordExpiryTimeComputed" | 
+Select-Object -Property "Displayname",@{Name="ExpiryDate";Expression={[datetime]::FromFileTime($_."msDS-UserPasswordExpiryTimeComputed")}}                            
