@@ -39,4 +39,14 @@ ForEach($u in $users) {
 
  }
 
+ #Deomonstrate the use of a param()
+
+ param(
+ [string] $user1 = (Read-Host "Enter AD User Name")
+  )
+
+ Get-ADUser -Filter {GivenName -eq $user1} -Properties Department, location, city
+
+
+
              
